@@ -1,15 +1,16 @@
 import * as Reactstrap from "reactstrap";
-import Header from "../../components/Headers/HEAD";
-import axios from "axios";
-import PaginationData from "../../components/Pagination/pagination.js";
 import { useState, useEffect } from "react";
+import axios from "axios";
+import Header from "../../components/Headers/HEAD";
+import PaginationData from "../../components/Pagination/pagination.js";
 import Search from "../../components/Search/search";
-import Modal from "./modal.js";
 import { NavLink as NavLinkRRD } from "react-router-dom";
-import { NavLink } from 'react-router-dom';
 import routes from "../../routes.js";
+
 import { useParams } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
+import Modal from "./modal.js";
 import ModalDetail from '../Records/ModalDetail.js'
 
 const Butonn = (routeName, data, name) => {
@@ -147,12 +148,19 @@ export default function List() {
     };
     fetchData();
     const storedTypeProfile = localStorage.getItem('User');
+    console.log('user;', storedTypeProfile)
     const json = JSON.parse(storedTypeProfile)
-    setTypeProfile(json.type_profile.map((e)=>{return e.type_profile }));
+    console.log(json)
+    const perfil = json.type_profile.map((e)=>{return e.type_profile })
+    console.log('per',perfil)
+    setTypeProfile(perfil);
+    console.log('perfil:',typeProfile)
 
   }, [modal, showAlertCuestion, program_id]
   );
-
+  useEffect(() => {
+    console.log('perfil:', typeProfile);
+  }, [typeProfile]);
   //filtro buscador
   const filteredRecords = records?.filter(record =>
     (record.number_record && record.number_record.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||

@@ -1,14 +1,17 @@
+import * as Reactstrap from "reactstrap";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import * as Reactstrap from "reactstrap";
-import { NavLink as NavLinkRRD } from "react-router-dom";
 import Header from "components/Headers/HEAD.js";
 import PaginationData from "../../components/Pagination/pagination.js";
-import routes from "../../routes.js";
 import Search from "../../components/Search/search"
+import { NavLink as NavLinkRRD } from "react-router-dom";
+import routes from "../../routes.js";
 import Loading from "../../components/loader/loader.js"
 
-
+import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
+import Modal from "./modal.js";
+import ModalDetail from '../Competences/ModalDetail.js'
+import { CompetenceProvider, useCompetenceContext } from '../../context/competencias/competenceContext.js';
 const Butonn = (routeName, data, name) => {
   const matchingRoute = routes.find(route => route.name === routeName);
 
@@ -67,43 +70,34 @@ const Butonn = (routeName, data, name) => {
   );
 };
 
-export default function List() {
-  const [competences, setCompetences] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  //bucador
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // pagination data
-  const totalCompetences = competences.length;
-  const [PerPage] = useState(9);
-  const [currentPage, setCurrentPage] = useState(1);
- 
-  const lastIndex = PerPage  * currentPage; // = 1 * 6 = 6
-  const firstIndex = lastIndex - PerPage; // = 6 - 6 = 0
-
- 
-  const getData = () => {
-    try {
-      axios.get("api/v1/competences")
-        .then((res) => {
-          setCompetences(res.data.results);
-          setTimeout(()=>{
-            setIsLoading(false)
-          },500)
-        })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const handleInputChange = event => {
-    setSearchTerm(event.target.value);
-  };
-
-  useEffect(() => {
-    getData()
-  }, [searchTerm]);
+function List() {
+  const {
+    competences,
+    isLoading,
+    searchTerm,
+    handleInputChange,
+    PerPage,
+        firstIndex,
+        lastIndex,
+    currentPage,
+    setCurrentPage,
+    registroSeleccionado,
+    setRegistroSeleccionado,
+    detail,
+    modal,
+    type,
+    selectedCompetence,
+    showAlertCuestion,
+    apiDeleteCompetence,
+    typeProfile,
+    toggle,
+    Edit,
+    destroy,
+    handleCloseAlert,
+    seeDetail,
+    toggleShow,
+    totalCompetences
+  } = useCompetenceContext();
 
  
   return (
@@ -117,7 +111,16 @@ export default function List() {
         <Reactstrap.Row>
           <div className="col">
             <Reactstrap.Card className="shadow">
-              <Reactstrap.CardHeader className="border-0">
+              <Reactstrap.CardHeader className="border-0"><Reactstrap.Button
+                  color="primary"
+                  type="button"
+                  className="btn-circle btn-neutral"
+                  onClick={toggle}
+                >
+                  <i className="ni ni-fat-add" />
+                </Reactstrap.Button>
+
+
                   {/* Utilizar el componente SearchBar */}
                   <Search
                   searchTerm={searchTerm}
@@ -169,7 +172,54 @@ export default function List() {
                         <td>
                           <Reactstrap.UncontrolledDropdown>
                             {Butonn('Resultados de aprendizaje', data._id, data.labor_competition)}
-                          </Reactstrap.UncontrolledDropdown>
+                          </Reactstrap.UncontrolledDropdown>      
+                          {typeProfile.includes('Administrador') && (
+  <>
+    {/* Edit button */}
+    <Reactstrap.Button
+      color="primary"
+      type="button"
+      className="btn-neutral btn-sm"
+      onClick={() => Edit(data)}
+      id={`icon1${data._id}`}
+    >
+      <i className="fa-solid fa-edit"></i>
+    </Reactstrap.Button>
+    <Reactstrap.UncontrolledTooltip
+      delay={0}
+      target={`icon1${data._id}`}
+    >
+      Editar
+    </Reactstrap.UncontrolledTooltip>
+
+    {/* Delete button */}
+    <Reactstrap.Button
+      color="primary"
+      type="button"
+      className="btn-neutral btn-sm"
+      onClick={() => destroy(data._id)}
+      id={`icon2${data.number_data}`}
+    >
+      <i className="fa-solid fa-trash-can"></i>
+    </Reactstrap.Button>
+    <Reactstrap.UncontrolledTooltip
+      delay={0}
+      target={`icon2${data.number_data}`}
+    >
+      Eliminar
+    </Reactstrap.UncontrolledTooltip>
+  </>
+)}
+                          <Reactstrap.Button
+                              color="primary"
+                              type="button"
+                              className="btn-neutral  btn-sm"
+                              onClick={() => seeDetail(data)}
+                            >
+                              <i className="fa-solid fa-eye"></i>
+
+                            </Reactstrap.Button>
+
                         </td>
                       </tr>
                     );
@@ -189,9 +239,28 @@ export default function List() {
                 </nav>
               </Reactstrap.CardFooter>
             </Reactstrap.Card>
+            <Modal
+                isOpen={modal}
+                toggle={toggle}
+                type={type}
+                data={selectedCompetence}
+                apiGet={`api/v1/competence/${selectedCompetence?._id}`}
+              />
+
+              
+                 {/* modal detalle  */}
+                 <ModalDetail 
+                competence={registroSeleccionado}
+                toggleShow={() => setRegistroSeleccionado(null)}
+              />
           </div>
         </Reactstrap.Row>
       </Reactstrap.Container>
+      {showAlertCuestion && (
+        <ALertModalCuestion api={apiDeleteCompetence} onClose={handleCloseAlert} />
+      )}
     </>
   );
 }
+
+export {List}

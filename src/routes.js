@@ -22,7 +22,7 @@ import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
-import Competences from "views/Competences/List";
+import Competences from "views/Competences/competence.js";
 import Projects from "views/Projects/List.js";
 import LearningResults from "views/Learning_Results/List.js";
 import Records from "views/Records/List.js";
