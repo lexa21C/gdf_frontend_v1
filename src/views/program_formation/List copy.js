@@ -10,7 +10,7 @@ import routes from "../../routes.js";
 import Search from "../../components/Search/search"
 import Loading from "../../components/loader/loader.js"
 
-import CreateProgram from "./createModal.js"
+import CreateUser from "./createModal.js"
 import ALertModalCuestion from '../../components/Alert/ALertModalCuestion.js'
 import ModalDetail from "./ModalDetail.js"
 
@@ -80,16 +80,6 @@ async function getData(_id) {
 }
 
 export default function List() {
-  const [type, setType] = useState(false);
-  const [modal, setModal] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState(null)
-  // eliminar
-  const [apiDeleteUser,setapiDeleteUser]=useState('');
-
-  const [registroSeleccionado, setRegistroSeleccionado] = useState(null);
-
-    //alertas
-    const [showAlertCuestion, setAlertCuenstion] = useState(false);
   const [program, setProgram] = useState([]);
   //bucador
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,30 +96,6 @@ export default function List() {
   const firstIndex = lastIndex - PerPage;
 
   const user =JSON.parse(localStorage.getItem("User"));
-  const toggle = () => {
-    setModal(!modal);
-    setType(false);
-  };
-  const Edit = (program) => {
-    setSelectedProgram(program);
-    setModal(true);
-    setType(true);
-  };
-
-  const seeDetail = (user) => {
-    setRegistroSeleccionado(user)
-  }
-
-
-  const destroy = (id) => {
-    setapiDeleteUser(`api/v1/user/${id}`)
-    setAlertCuenstion(true)
-  }
-
-    //alertas
-    const handleCloseAlert = () => {
-      setAlertCuenstion(false);
-    };
 
   const handleInputChange = (event) => {
     setSearchTerm(event.target.value);
@@ -144,7 +110,7 @@ export default function List() {
       },500)
     }
     fetchData();
-  }, [searchTerm,modal, showAlertCuestion]);
+  }, [searchTerm]);
 
   return (
     <>
@@ -155,12 +121,6 @@ export default function List() {
           <div className="col">
             <Reactstrap.Card className="shadow">
               <Reactstrap.CardHeader className="border-0">
-              <Reactstrap.Button color="primary"
-                  type="button"
-                  className="btn-circle btn-neutral "
-                  onClick={toggle}>
-                  <i className="ni ni-fat-add" />
-                </Reactstrap.Button>
                 {/* Utilizar el componente SearchBar */}
                 <Search
                   searchTerm={searchTerm}
@@ -208,62 +168,6 @@ export default function List() {
                           <td>{data.total_duration}</td>
                           <td>{data.program_level.program_level}</td>
                           <td>
-                            {/* Boton ver  */}
-                        <Reactstrap.Button
-                              color="primary"
-                              type="button"
-                              className="btn-neutral  btn-sm"
-                              onClick={() => seeDetail(user)}
-                            >
-                              <i className="fa-solid fa-eye"></i>
-
-                            </Reactstrap.Button>
-                       
-                          {/* Boton editar
-                          <Reactstrap.Button
-                            color="primary"
-                            type="button"
-                            className="btn-neutral  btn-sm"
-                            onClick={() => EditUsers(user)}
-                            id={`userN${user._id}`}
-                          >
-                            <i className="fa-solid fa-edit"></i>
-                          </Reactstrap.Button> */}
-
-                          {/* Edit button */}
-                          <Reactstrap.Button
-                                  color="primary"
-                                  type="button"
-                                  className="btn-neutral btn-sm"
-                                  onClick={() => Edit(data)}
-                                  id={`icon1${data._id}`}
-                                >
-                                  <i className="fa-solid fa-edit"></i>
-                                </Reactstrap.Button>
-                                <Reactstrap.UncontrolledTooltip
-                                  delay={0}
-                                  target={`icon1${data._id}`}
-                                >
-                                  Editar
-                                </Reactstrap.UncontrolledTooltip>
-
-                                {/* Delete button */}
-                                <Reactstrap.Button
-                                  color="primary"
-                                  type="button"
-                                  className="btn-neutral btn-sm"
-                                  onClick={() => destroy(data._id)}
-                                  id={`icon2${data.number_data}`}
-                                >
-                                  <i className="fa-solid fa-trash-can"></i>
-                                </Reactstrap.Button>
-                                <Reactstrap.UncontrolledTooltip
-                                  delay={0}
-                                  target={`icon2${data.number_data}`}
-                                >
-                                  Eliminar
-                                </Reactstrap.UncontrolledTooltip>
-                              
                             <Reactstrap.UncontrolledDropdown className="mr-2">
                               {Butonn('Fichas', data._id, data.program_name)}
                             </Reactstrap.UncontrolledDropdown>
@@ -277,20 +181,6 @@ export default function List() {
                       );
                     })}
                 </tbody>
-                {/* Modal crear usuarios */}
-                <CreateProgram
-              isOpen={modal}
-              toggle={toggle}
-              type={type}
-              data={selectedProgram}
-              apiGet={`api/v1/formation_program/${selectedProgram?._id}`}
-            />
-
-                 {/* modal detalle  */}
-              <ModalDetail 
-              user={registroSeleccionado}
-              toggleShow={() => setRegistroSeleccionado(null)}
-              />
               </Reactstrap.Table>
 
               <Reactstrap.CardFooter className="py-4">
@@ -307,9 +197,6 @@ export default function List() {
           </div>
         </Reactstrap.Row>
       </Reactstrap.Container>
-      {showAlertCuestion && (
-        <ALertModalCuestion  api={apiDeleteUser} onClose={handleCloseAlert} />
-      )}
     </>
   );
 }

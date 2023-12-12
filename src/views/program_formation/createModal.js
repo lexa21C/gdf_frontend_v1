@@ -5,9 +5,14 @@ import SelectSearch from "../../components/SelectSearch/SelectSearch.js"
 import { useParams } from "react-router-dom";
 import AlertModal from '../../components/Alert/AlertModal.js'
 import InputValidation from '../../Helpers/validacion.js'
+import Select from "react-select";
 
-const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
-
+const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
+  /*Formation prograns*/
+  const [competence,setCompetence] = useState([]);
+  const [ programLevel, setProgramLevel] = useState([])
+  const [ thematicLine, setThematicLine] = useState([])
+  const [selectedPrograms, setSelectedPrograms] = useState([]);
   const user = localStorage.getItem('User')
 
   let user_JSON = JSON.parse(user)
@@ -20,7 +25,7 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
   const [selectedResult] = useState(null);
 
   const { program_id } = useParams()
-
+  
   // alertas
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState('');
@@ -33,12 +38,37 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
   const setInputValidity = (isValid) => {
     setIsValidForm(isValid);
   };
-
+  let options_program = [];
+  let optionsProgramLevel = [];
+  let optionsThematicLine = [];
    //estados de titulos y botones
    const [title, setTitle] = useState("");
    const [nameButton, setNameButton] = useState("");
-
+   const getProgramLevel= async () => {
+    const { data } = await axios.get('api/v1/programlevels');
+    console.log(data.results)
+   setProgramLevel(data.results)
+    console.log('program:', programLevel)
+  };
+  const getCompetence = async () => {
+    const { data } = await axios.get('api/v1/formation_programs');
+    console.log(data.results)
+   setCompetence(data.results)
+    console.log('program:',competence)
+  };
+  
+  const getThematicLine = async () => {
+    const { data } = await axios.get('api/v1/thematics');
+    console.log(data.results)
+   setThematicLine(data.results)
+    console.log('program:',thematicLine)
+  };
+  
   useEffect(() => { 
+    
+    
+   
+  
     console.log('entra al modal')
     if (type === true) {
       const fetchData = async () => {
@@ -66,20 +96,58 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
       setTitle("Registrar");
       setNameButton("Registrar");
     }
+   getCompetence()
+   getProgramLevel()
+   getThematicLine()
+    
   }, [program_id, selectedResult, type, apiGet])
-
-
+  
+  for (let i = 0; i <competence?.length; i++) {
+    options_program.push({
+      value: competence[i]?._id,
+      label: competence[i]?.program_name,
+    });
+  }
+  for (let i = 0; i <programLevel?.length; i++) {
+    optionsProgramLevel.push({
+      value: programLevel[i]?._id,
+      label: programLevel[i]?.program_level,
+    });
+  }
+  for (let i = 0; i <thematicLine?.length; i++) {
+    optionsThematicLine.push({
+      value: thematicLine[i]?._id,
+      label: thematicLine[i]?.thematic_line,
+    });
+  }
   const handleResultSelected = (result) => {
     setData({ ...data, user: result });
   }
+  const handleSelectChange = (selectedProgram) => {
+    setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
+    setSelectedPrograms(selectedProgram);
+  };
+  const handleSelectChange1 = (selectedProgram) => {
+    // setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
+    setSelectedPrograms(selectedProgram);
+  };
+  const handleSelectChange2 = (selectedProgram) => {
+    // setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
+    setSelectedPrograms(selectedProgram);
+  };
+
 
   const handleChange2 = (value, fieldName) => {
     setData({ ...data, [fieldName]: value });
   };
 
-  const handleCloseAlert = () => {
+   //  alertas
+   const handleCloseAlert = () => {
     setShowAlert(false);
   };
+
+  
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -136,12 +204,13 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
     <>
       <Reactstrap.Modal
         className="modal-dialog-centered "
-        isOpen={isOpen} toggle={toggle}
+        isOpen={isOpen}
+        toggle={toggle}
       >
         <div className="modal-body p-0">
           <Reactstrap.Card className="bg-secondary shadow border-0">
             <Reactstrap.CardHeader className="bg-transparent pb-1">
-              <Reactstrap.ModalHeader toggle={toggle} className='col-12 p-0'>
+              <Reactstrap.ModalHeader toggle={toggle} className="col-12 p-0">
                 <div>
                   <h4>{title} Competencia </h4>
                 </div>
@@ -155,16 +224,18 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                   <span className="text-danger">*</span> 
-                   Nombre de la Competencia 
+                    <span className="text-danger">*</span>
+                    Nombre de la Competencia
                   </label>
                   <InputValidation
-                    placeholder='Nombre de NSCL'
-                    type='textarea'
-                    name='labor_competition'
+                    placeholder="Nombre de NSCL"
+                    type="textarea"
+                    name="labor_competition"
                     minLength={2}
                     value={data?.labor_competition}
-                    onChange={(value) => handleChange2(value, 'labor_competition')}
+                    onChange={(value) =>
+                      handleChange2(value, "labor_competition")
+                    }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
@@ -173,16 +244,18 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                   <span className="text-danger">*</span> 
-                   Competencia del Programa
+                    <span className="text-danger">*</span>
+                    Competencia del Programa
                   </label>
                   <InputValidation
-                    placeholder='Nombre'
-                    type='text'
-                    name='program_competition'
+                    placeholder="Nombre"
+                    type="text"
+                    name="program_competition"
                     minLength={2}
                     value={data?.program_competition}
-                    onChange={(value) => handleChange2(value, 'program_competition')}
+                    onChange={(value) =>
+                      handleChange2(value, "program_competition")
+                    }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
@@ -191,16 +264,18 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                   <span className="text-danger">*</span> 
-                   Código 
+                    <span className="text-danger">*</span>
+                    Código
                   </label>
                   <InputValidation
-                    placeholder='Codigo NSC'
-                    type='number'
-                    name='labor_competence_code'
+                    placeholder="Codigo NSC"
+                    type="number"
+                    name="labor_competence_code"
                     minLength={2}
                     value={data.labor_competence_code}
-                    onChange={(value) => handleChange2(value, 'labor_competence_code')}
+                    onChange={(value) =>
+                      handleChange2(value, "labor_competence_code")
+                    }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
@@ -209,16 +284,18 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                   <span className="text-danger">*</span> 
-                   Version
+                    <span className="text-danger">*</span>
+                    Version
                   </label>
                   <InputValidation
-                    placeholder='Numero'
-                    type='number'
-                    name='labor_competition_version'
+                    placeholder="Numero"
+                    type="number"
+                    name="labor_competition_version"
                     minLength={1}
                     value={data?.labor_competition_version}
-                    onChange={(value) => handleChange2(value, 'labor_competition_version')}
+                    onChange={(value) =>
+                      handleChange2(value, "labor_competition_version")
+                    }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
@@ -227,20 +304,72 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                   <span className="text-danger">*</span> 
-                   Duración Estimada
+                    <span className="text-danger">*</span>
+                    Duración Estimada
                   </label>
                   <InputValidation
-                    placeholder='Horas'
-                    type='number'
-                    name='estimated_duration'
+                    placeholder="Horas"
+                    type="number"
+                    name="estimated_duration"
                     minLength={1}
                     value={data?.estimated_duration}
-                    onChange={(value) => handleChange2(value, 'estimated_duration')}
+                    onChange={(value) =>
+                      handleChange2(value, "estimated_duration")
+                    }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
-              
+                <Reactstrap.FormGroup className="mb-3">
+                  <label
+                    className="form-control-label"
+                    htmlFor="input-username"
+                  >
+                    <span className="text-danger">*</span>Seleccione la
+                    Competencia{" "}
+                  </label>
+
+                  <Reactstrap.FormGroup>
+                    <Select
+                      options={options_program}
+                      value={selectedPrograms}
+                      isMulti
+                      onChange={handleSelectChange}
+                    />
+                  </Reactstrap.FormGroup>
+                </Reactstrap.FormGroup>
+                <Reactstrap.FormGroup className="mb-3">
+                  <label
+                    className="form-control-label"
+                    htmlFor="input-username"
+                  >
+                    <span className="text-danger">*</span>Seleccione el nivel del Programa 
+                  </label>
+
+                  <Reactstrap.FormGroup>
+                    <Select
+                      options={optionsProgramLevel}
+                      value={selectedPrograms}
+                      onChange={handleSelectChange1}
+                    />
+                  </Reactstrap.FormGroup>
+                </Reactstrap.FormGroup>
+                <Reactstrap.FormGroup className="mb-3">
+                  <label
+                    className="form-control-label"
+                    htmlFor="input-username"
+                  >
+                    <span className="text-danger">*</span>Seleccione la linea tematica 
+                  </label>
+
+                  <Reactstrap.FormGroup>
+                    <Select
+                      options={optionsThematicLine}
+                      value={selectedPrograms}
+                      onChange={handleSelectChange2}
+                    />
+                  </Reactstrap.FormGroup>
+                </Reactstrap.FormGroup>
+
                 <div className="text-center">
                   <Reactstrap.Button
                     className="my-4"
@@ -254,15 +383,16 @@ const ModalExample = ({ isOpen, toggle, apiGet, type }) => {
             </Reactstrap.CardBody>
           </Reactstrap.Card>
         </div>
-
       </Reactstrap.Modal>
       {showAlert && (
-        <AlertModal type={alertType} message={alertMessage} onClose={handleCloseAlert} />
+        <AlertModal
+          type={alertType}
+          message={alertMessage}
+          onClose={handleCloseAlert}
+        />
       )}
-
     </>
-
   );
 };
 
-export default ModalExample;
+export default CreateProgram;
