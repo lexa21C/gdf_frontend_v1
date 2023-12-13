@@ -1,120 +1,157 @@
-import React, { useState, useEffect } from 'react';
-import * as Reactstrap from 'reactstrap'
-import axios from 'axios';
-import SelectSearch from "../../components/SelectSearch/SelectSearch.js"
+import React, { useState, useEffect } from "react";
+import * as Reactstrap from "reactstrap";
+import axios from "axios";
+import SelectSearch from "../../components/SelectSearch/SelectSearch.js";
 import { useParams } from "react-router-dom";
-import AlertModal from '../../components/Alert/AlertModal.js'
-import InputValidation from '../../Helpers/validacion.js'
+import AlertModal from "../../components/Alert/AlertModal.js";
+import InputValidation from "../../Helpers/validacion.js";
 import Select from "react-select";
 
-const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
-  /*Formation prograns*/
-  const [competence,setCompetence] = useState([]);
-  const [ programLevel, setProgramLevel] = useState([])
-  const [ thematicLine, setThematicLine] = useState([])
-  const [selectedPrograms, setSelectedPrograms] = useState([]);
-  const user = localStorage.getItem('User')
-
-  let user_JSON = JSON.parse(user)
-
-  let formation_programId = user_JSON.formation_program[0]._id
-
-
+const CreateProgram  = ({ isOpen, toggle, apiGet, apiGetPrograms, type }) => {
+  //program
   const [data, setData] = useState({});
-
   const [selectedResult] = useState(null);
-
-  const { program_id } = useParams()
-  
+  const { program_id } = useParams();
+  //competence
+  const [competence, setCompetence] = useState([]);
+  const [selectedCompetence, setSelectedCompetence] = useState([]);
+  //program Level
+  const [programLevel, setProgramLevel] = useState([]);
+  const [selectedProgramLevel, setSelectedProgramLevel] = useState([]);
+  // thematic line
+  const [thematicLine, setThematicLine] = useState(null);
+  const [selectedThematicLine, setSelectedThematicLine] = useState(null);
   // alertas
   const [showAlert, setShowAlert] = useState(false);
-  const [alertType, setAlertType] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  //estados de titulos y botones
+  const [title, setTitle] = useState("");
+  const [nameButton, setNameButton] = useState("");
+  //user
+  const user = localStorage.getItem("User");
+  let user_JSON = JSON.parse(user);
+  let formation_programId = user_JSON.formation_program[0]._id;
 
   //validación del formulario
   const [isValidForm, setIsValidForm] = useState(true);
+
+  //variables
+  let options_program = [];
+  let optionsProgramLevel = [];
+  let optionsThematicLine = [];
 
   // Función para actualizar el estado isValidForm
   const setInputValidity = (isValid) => {
     setIsValidForm(isValid);
   };
-  let options_program = [];
-  let optionsProgramLevel = [];
-  let optionsThematicLine = [];
-   //estados de titulos y botones
-   const [title, setTitle] = useState("");
-   const [nameButton, setNameButton] = useState("");
-   const getProgramLevel= async () => {
-    const { data } = await axios.get('api/v1/programlevels');
-    console.log(data.results)
-   setProgramLevel(data.results)
-    console.log('program:', programLevel)
+  // funciones get 
+  const getProgramLevel = async () => {
+    const { data } = await axios.get("api/v1/programlevels");
+    console.log(data.results);
+    setProgramLevel(data.results);
+    console.log("program:", programLevel);
   };
   const getCompetence = async () => {
-    const { data } = await axios.get('api/v1/formation_programs');
-    console.log(data.results)
-   setCompetence(data.results)
-    console.log('program:',competence)
+    const { data } = await axios.get("api/v1/formation_programs");
+    console.log(data.results);
+    setCompetence(data.results);
+    console.log("program:", competence);
   };
-  
+
   const getThematicLine = async () => {
-    const { data } = await axios.get('api/v1/thematics');
-    console.log(data.results)
-   setThematicLine(data.results)
-    console.log('program:',thematicLine)
+    const { data } = await axios.get("api/v1/thematics");
+    console.log(data.results);
+    setThematicLine(data.results);
+    console.log("program:", thematicLine);
   };
-  
-  useEffect(() => { 
-    
-    
-   
-  
-    console.log('entra al modal')
+  // function edit program formation
+  const editProgram = async () => {
+    try {
+      const { data: res } = await axios.put(`api/v1/formation_program/${data._id}`, data);
+      setAlertType(res.data.status);
+          setAlertMessage(res.data.message);
+          setShowAlert(true);
+    } catch (err){
+      setAlertType(err.status);
+          setAlertMessage(err.message);
+          setShowAlert(true);
+
+    }
+  }
+  // function create program formation
+  const createProgramFormation = async () => {
+    try {
+      const res= await axios.post("api/v1/formation_program", data)
+      if (res.data.status === "success") {
+        toggle(!toggle);
+
+        setData({
+          program_name: "",
+          program_code: "",
+          total_duration: "",
+          Program_version: "",
+          competence: "",
+          program_level: "",
+          thematic_line: "",
+        });
+      }
+      setAlertType(res.data.status);
+      setAlertMessage(res.data.message);
+      setShowAlert(true);
+    }catch (err){
+      setAlertType(err.status);
+          setAlertMessage(err.message);
+          setShowAlert(true);
+
+    }
+  }
+  useEffect(() => {
+    console.log("entra al modal");
     if (type === true) {
       const fetchData = async () => {
         const { data } = await axios.get(apiGet);
         setData(data.results);
-        console.log(data)
-      }
+        console.log(data);
+      };
 
       fetchData();
 
       setTitle("Editar");
       setNameButton("Actualizar");
-
     } else {
-      console.log('entra al modal')
+      console.log("entra al modal");
       setData({
-        labor_competition: '',
-        labor_competence_code: '',
-        program_competition: '',
-        labor_competition_version: '',
-        estimated_duration: ''
-    
-      })
-      
+        program_name: "",
+        program_code: "",
+        number_quarters: "",
+        total_duration: "",
+        Program_version: "",
+        competence: "",
+        program_level: "",
+        thematic_line: "",
+      });
       setTitle("Registrar");
       setNameButton("Registrar");
     }
-   getCompetence()
-   getProgramLevel()
-   getThematicLine()
-    
-  }, [program_id, selectedResult, type, apiGet])
-  
-  for (let i = 0; i <competence?.length; i++) {
+    getCompetence();
+    getProgramLevel();
+    getThematicLine();
+  }, [program_id, selectedResult, type, apiGet]);
+
+  for (let i = 0; i < competence?.length; i++) {
     options_program.push({
       value: competence[i]?._id,
       label: competence[i]?.program_name,
     });
   }
-  for (let i = 0; i <programLevel?.length; i++) {
+  for (let i = 0; i < programLevel?.length; i++) {
     optionsProgramLevel.push({
       value: programLevel[i]?._id,
       label: programLevel[i]?.program_level,
     });
   }
-  for (let i = 0; i <thematicLine?.length; i++) {
+  for (let i = 0; i < thematicLine?.length; i++) {
     optionsThematicLine.push({
       value: thematicLine[i]?._id,
       label: thematicLine[i]?.thematic_line,
@@ -122,32 +159,31 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
   }
   const handleResultSelected = (result) => {
     setData({ ...data, user: result });
-  }
-  const handleSelectChange = (selectedProgram) => {
-    setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
-    setSelectedPrograms(selectedProgram);
   };
-  const handleSelectChange1 = (selectedProgram) => {
+  const handleSelectChangeCompetence = (selectedCompetence) => {
+    setData({
+      ...data,
+      competence: selectedCompetence.map((e) => e.value),
+    });
+    setSelectedCompetence(selectedCompetence);
+  };
+  const handleSelectChangeProgramLevel = (selectedProgramLevel) => {
+    setData({ ...data, thematic_line: selectedProgramLevel });
+    setSelectedProgramLevel(selectedProgramLevel);
+  };
+  const handleSelectChangeThematicLine = (selectedThematicLine) => {
     // setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
-    setSelectedPrograms(selectedProgram);
+    setSelectedThematicLine(selectedThematicLine);
   };
-  const handleSelectChange2 = (selectedProgram) => {
-    // setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
-    setSelectedPrograms(selectedProgram);
-  };
-
 
   const handleChange2 = (value, fieldName) => {
     setData({ ...data, [fieldName]: value });
   };
 
-   //  alertas
-   const handleCloseAlert = () => {
+  //  alertas
+  const handleCloseAlert = () => {
     setShowAlert(false);
   };
-
-  
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -158,47 +194,51 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
       return;
     }
 
-      if (type === false) {
+    if (type === false) {
+      console.log("registrar");
+      console.log(data);
 
-    
-        axios.post('api/v1/competence', data).then(
-          (res) => {
-            if(res.data.status==='success'){
-              toggle(!toggle);
+      axios
+        .post("api/v1/formation_program", data)
+        .then((res) => {
+          if (res.data.status === "success") {
+            toggle(!toggle);
 
-              setData({
-                labor_competition: '',
-                labor_competence_code: '',
-                program_competition: '',
-                labor_competition_version: '',
-                estimated_duration: ''
-            
-              })
-            }
-            setAlertType(res.data.status);
-            setAlertMessage(res.data.message);
-            setShowAlert(true);
+            setData({
+              program_name: "",
+              program_code: "",
+              total_duration: "",
+              Program_version: "",
+              competence: "",
+              program_level: "",
+              thematic_line: "",
+            });
           }
-
-        ).catch((err) => {
+          setAlertType(res.data.status);
+          setAlertMessage(res.data.message);
+          setShowAlert(true);
+        })
+        .catch((err) => {
           setAlertType(err.status);
           setAlertMessage(err.message);
           setShowAlert(true);
         });
-      } else {
-        const { data: res } = axios.put(`api/v1/competence/${data._id}`, data).then(
-          (res) => {
-            setAlertType(res.data.status);
-            setAlertMessage(res.data.message);
-            setShowAlert(true);
-
-          }).catch((err) => {
-            setAlertType(err.status);
-            setAlertMessage(err.message);
-            setShowAlert(true);
-          })
-        toggle(!toggle);
-      }
+    } else {
+      // const { data: res } = axios
+      //   .put(`api/v1/formation_program/${data._id}`, data)
+      //   .then((res) => {
+      //     setAlertType(res.data.status);
+      //     setAlertMessage(res.data.message);
+      //     setShowAlert(true);
+      //   })
+      //   .catch((err) => {
+      //     setAlertType(err.status);
+      //     setAlertMessage(err.message);
+      //     setShowAlert(true);
+      //   });
+      editProgram()
+      toggle(!toggle);
+    }
   };
   return (
     <>
@@ -230,12 +270,10 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                   <InputValidation
                     placeholder="Ejemplo: OPERACIÓN DE EQUIPOS"
                     type="textarea"
-                    name="labor_competition"
+                    name="program_name"
                     minLength={2}
-                    value={data?.labor_competition}
-                    onChange={(value) =>
-                      handleChange2(value, "labor_competition")
-                    }
+                    value={data?.program_name}
+                    onChange={(value) => handleChange2(value, "program_name")}
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
@@ -246,17 +284,15 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                     htmlFor="input-username"
                   >
                     <span className="text-danger">*</span>
-                    Código 
+                    Código
                   </label>
                   <InputValidation
                     placeholder="Ejemplo: 147837"
                     type="number"
-                    name="labor_competence_code"
+                    name="program_code"
                     minLength={6}
-                    value={data.labor_competence_code}
-                    onChange={(value) =>
-                      handleChange2(value, "labor_competence_code")
-                    }
+                    value={data.program_code}
+                    onChange={(value) => handleChange2(value, "program_code")}
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
@@ -271,8 +307,8 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                   <Reactstrap.FormGroup>
                     <Select
                       options={optionsProgramLevel}
-                      value={selectedPrograms}
-                      onChange={handleSelectChange1}
+                      value={selectedProgramLevel}
+                      onChange={handleSelectChangeProgramLevel}
                     />
                   </Reactstrap.FormGroup>
                 </Reactstrap.FormGroup>
@@ -287,11 +323,11 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                   <InputValidation
                     placeholder="Numero"
                     type="number"
-                    name="labor_competition_version"
+                    name="Program_version"
                     minLength={1}
-                    value={data?.labor_competition_version}
+                    value={data?.Program_version}
                     onChange={(value) =>
-                      handleChange2(value, "labor_competition_version")
+                      handleChange2(value, "Program_version")
                     }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
@@ -307,30 +343,27 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                   <InputValidation
                     placeholder="Horas"
                     type="number"
-                    name="estimated_duration"
+                    name="total_duration"
                     minLength={1}
                     value={data?.estimated_duration}
-                    onChange={(value) =>
-                      handleChange2(value, "estimated_duration")
-                    }
+                    onChange={(value) => handleChange2(value, "total_duration")}
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
-                
-                
+
                 <Reactstrap.FormGroup className="mb-3">
                   <label
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                    <span className="text-danger">*</span>Linea Tematica 
+                    <span className="text-danger">*</span>Linea Tematica
                   </label>
 
                   <Reactstrap.FormGroup>
                     <Select
                       options={optionsThematicLine}
-                      value={selectedPrograms}
-                      onChange={handleSelectChange2}
+                      value={selectedThematicLine}
+                      onChange={handleSelectChangeThematicLine}
                     />
                   </Reactstrap.FormGroup>
                 </Reactstrap.FormGroup>
@@ -346,13 +379,12 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                   <Reactstrap.FormGroup>
                     <Select
                       options={options_program}
-                      value={selectedPrograms}
+                      value={selectedCompetence}
                       isMulti
-                      onChange={handleSelectChange}
+                      onChange={handleSelectChangeCompetence}
                     />
                   </Reactstrap.FormGroup>
                 </Reactstrap.FormGroup>
-        
 
                 <div className="text-center">
                   <Reactstrap.Button

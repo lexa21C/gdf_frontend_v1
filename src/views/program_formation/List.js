@@ -89,7 +89,7 @@ export default function List() {
   const [registroSeleccionado, setRegistroSeleccionado] = useState(null);
 
     //alertas
-    const [showAlertCuestion, setAlertCuenstion] = useState(false);
+  const [showAlertCuestion, setAlertCuenstion] = useState(false);
   const [program, setProgram] = useState([]);
   //bucador
   const [searchTerm, setSearchTerm] = useState("");
