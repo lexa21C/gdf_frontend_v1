@@ -212,7 +212,7 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
             <Reactstrap.CardHeader className="bg-transparent pb-1">
               <Reactstrap.ModalHeader toggle={toggle} className="col-12 p-0">
                 <div>
-                  <h4>{title} Competencia </h4>
+                  <h4>{title} Programa </h4>
                 </div>
               </Reactstrap.ModalHeader>
             </Reactstrap.CardHeader>
@@ -225,10 +225,10 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                     htmlFor="input-username"
                   >
                     <span className="text-danger">*</span>
-                    Nombre de la Competencia
+                    Programa
                   </label>
                   <InputValidation
-                    placeholder="Nombre de NSCL"
+                    placeholder="Ejemplo: OPERACIÓN DE EQUIPOS"
                     type="textarea"
                     name="labor_competition"
                     minLength={2}
@@ -239,22 +239,23 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
+
                 <Reactstrap.FormGroup className="mb-3">
                   <label
                     className="form-control-label"
                     htmlFor="input-username"
                   >
                     <span className="text-danger">*</span>
-                    Competencia del Programa
+                    Código 
                   </label>
                   <InputValidation
-                    placeholder="Nombre"
-                    type="text"
-                    name="program_competition"
-                    minLength={2}
-                    value={data?.program_competition}
+                    placeholder="Ejemplo: 147837"
+                    type="number"
+                    name="labor_competence_code"
+                    minLength={6}
+                    value={data.labor_competence_code}
                     onChange={(value) =>
-                      handleChange2(value, "program_competition")
+                      handleChange2(value, "labor_competence_code")
                     }
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
@@ -264,20 +265,16 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                    <span className="text-danger">*</span>
-                    Código
+                    <span className="text-danger">*</span>Nivel de Programa
                   </label>
-                  <InputValidation
-                    placeholder="Codigo NSC"
-                    type="number"
-                    name="labor_competence_code"
-                    minLength={2}
-                    value={data.labor_competence_code}
-                    onChange={(value) =>
-                      handleChange2(value, "labor_competence_code")
-                    }
-                    setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
-                  />
+
+                  <Reactstrap.FormGroup>
+                    <Select
+                      options={optionsProgramLevel}
+                      value={selectedPrograms}
+                      onChange={handleSelectChange1}
+                    />
+                  </Reactstrap.FormGroup>
                 </Reactstrap.FormGroup>
                 <Reactstrap.FormGroup className="mb-3">
                   <label
@@ -319,13 +316,31 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                     setIsValid={setInputValidity} // Pasamos la función setIsValidForm al componente InputValidation
                   />
                 </Reactstrap.FormGroup>
+                
+                
                 <Reactstrap.FormGroup className="mb-3">
                   <label
                     className="form-control-label"
                     htmlFor="input-username"
                   >
-                    <span className="text-danger">*</span>Seleccione la
-                    Competencia{" "}
+                    <span className="text-danger">*</span>Linea Tematica 
+                  </label>
+
+                  <Reactstrap.FormGroup>
+                    <Select
+                      options={optionsThematicLine}
+                      value={selectedPrograms}
+                      onChange={handleSelectChange2}
+                    />
+                  </Reactstrap.FormGroup>
+                </Reactstrap.FormGroup>
+                <Reactstrap.FormGroup className="mb-3">
+                  <label
+                    className="form-control-label"
+                    htmlFor="input-username"
+                  >
+                    <span className="text-danger">*</span>
+                    Competencia
                   </label>
 
                   <Reactstrap.FormGroup>
@@ -337,38 +352,7 @@ const CreateProgram = ({ isOpen, toggle, apiGet,  apiGetPrograms,type }) => {
                     />
                   </Reactstrap.FormGroup>
                 </Reactstrap.FormGroup>
-                <Reactstrap.FormGroup className="mb-3">
-                  <label
-                    className="form-control-label"
-                    htmlFor="input-username"
-                  >
-                    <span className="text-danger">*</span>Seleccione el nivel del Programa 
-                  </label>
-
-                  <Reactstrap.FormGroup>
-                    <Select
-                      options={optionsProgramLevel}
-                      value={selectedPrograms}
-                      onChange={handleSelectChange1}
-                    />
-                  </Reactstrap.FormGroup>
-                </Reactstrap.FormGroup>
-                <Reactstrap.FormGroup className="mb-3">
-                  <label
-                    className="form-control-label"
-                    htmlFor="input-username"
-                  >
-                    <span className="text-danger">*</span>Seleccione la linea tematica 
-                  </label>
-
-                  <Reactstrap.FormGroup>
-                    <Select
-                      options={optionsThematicLine}
-                      value={selectedPrograms}
-                      onChange={handleSelectChange2}
-                    />
-                  </Reactstrap.FormGroup>
-                </Reactstrap.FormGroup>
+        
 
                 <div className="text-center">
                   <Reactstrap.Button
