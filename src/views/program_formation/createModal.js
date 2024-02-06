@@ -168,11 +168,11 @@ const CreateProgram  = ({ isOpen, toggle, apiGet, apiGetPrograms, type }) => {
     setSelectedCompetence(selectedCompetence);
   };
   const handleSelectChangeProgramLevel = (selectedProgramLevel) => {
-    setData({ ...data, thematic_line: selectedProgramLevel });
+    setData({ ...data, program_level: selectedProgramLevel.value });
     setSelectedProgramLevel(selectedProgramLevel);
   };
   const handleSelectChangeThematicLine = (selectedThematicLine) => {
-    // setData({ ...data, formation_program: selectedProgram.map((e) => e.value) });
+    setData({ ...data, formation_program: selectedThematicLine.value});
     setSelectedThematicLine(selectedThematicLine);
   };
 
